@@ -154,6 +154,9 @@ class Bomb:
 
 class Score:
     def __init__(self) -> None:
+        """
+        スコアを表示するための初期化を行う
+        """
         self.fonto = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 30)
         self.color = (0,0,255)
         self.score = 0
@@ -161,10 +164,17 @@ class Score:
         self.center = [100, HEIGHT-50]
     
     def update(self, screen: pg.Surface) -> None:
+        """
+        最新のスコアを表示する
+        引数 screen：画面Surface
+        """
         self.img = self.fonto.render(f"スコア:{self.score}", 0, self.color)
         screen.blit(self.img, self.center)
 
     def add(self)-> None:
+        """
+        スコアを1加算する
+        """
         self.score += 1
 
 class Explosion:
@@ -256,9 +266,11 @@ def main():
         screen.blit(bg_img, [0, 0])
         
         if timer.is_time_over():
+            # タイムオーバーじの画面切り替え
             img_num = 8
             text = "Time Over"
             if not bombs:
+                # 全ての爆弾を打ち落としている際の設定
                 img_num = 6
                 text = "GameClear"
             bird.change_img(img_num, screen)
@@ -291,6 +303,7 @@ def main():
                         score.add()
                         pg.display.update() 
         
+        # 各配列
         bombs = [bomb for bomb in bombs if bomb is not None]
         beams = [beam for beam in beams if beam is not None and beam.is_over_monitor()]
         effects = [eff for eff in effects if eff.is_live()]
