@@ -162,7 +162,38 @@ class Score:
     def add(self)-> None:
         self.score += 1
 
+class Explosion:
+    """
+    爆発エフェクトに関するクラス
+    """
+    def __init__(self,bomb:Bomb) -> None:
+        """
+        爆発画像Surfaceを生成する
+        引数 bomb：爆発した爆弾インスタンス
+        """
+        self.imgs = [
+            pg.image.load(f"fig/explosion.gif"),
+            pg.transform.flip(pg.image.load(f"fig/explosion.gif"),True,True)
+        ]
+        self.center = bomb.rct.center
+        self.life = 20
+    
+    def update(self,screen: pg.Surface)->None:
+        """
+        爆発エフェクトを表示させ、lifeを減らす
+        引数 screen：画面Surface
+        """
+        self.life -= 1
+        screen.blit(self.imgs[self.life//4%2],self.center)
+    
+    def is_live(self)->bool:
+        """
+        この爆発エフェクトのliveが生きているか判定します
+        戻り値 bool : 生きていたらTrue
+        """
+        return self.life >= 0
 
+        
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))    
@@ -170,6 +201,7 @@ def main():
     bird = Bird((300, 200))
     bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]
     beams = []
+    effects = []
     score = Score()
     clock = pg.time.Clock()
     tmr = 0
@@ -198,6 +230,7 @@ def main():
             for j,beam in enumerate(beams):
                 if bomb is not None and beam is not None:
                     if beam.rct.colliderect(bomb.rct):  # ビームと爆弾が衝突したら
+                        effects.append(Explosion(bomb))
                         beams[j], bombs[i] = None, None
                         bird.change_img(6, screen)
                         score.add()
@@ -205,6 +238,7 @@ def main():
         
         bombs = [bomb for bomb in bombs if bomb is not None]
         beams = [beam for beam in beams if beam is not None and beam.is_over_monitor()]
+        effects = [eff for eff in effects if eff.is_live()]
 
         key_lst = pg.key.get_pressed()
         bird.update(key_lst, screen)
@@ -212,6 +246,8 @@ def main():
             beam.update(screen) 
         for bomb in bombs:  
             bomb.update(screen)
+        for eff in effects:
+            eff.update(screen)
         score.update(screen)
         pg.display.update()
         tmr += 1
