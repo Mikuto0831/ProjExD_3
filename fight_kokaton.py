@@ -198,6 +198,41 @@ class Explosion:
         """
         return self.life >= 0
 
+class Timer:
+    """
+    ゲームのタイマーをset/表示する
+    """
+    def __init__(self,time:int) -> None:
+        """
+        引き数 time : 行う秒数
+        """
+        self.fonto = pg.font.SysFont("hgp創英角ﾎﾟｯﾌﾟ体", 30)
+        self.color = (0,0,255)
+        self.time = time
+        self.one_second_cnt = 0  # 一秒を数える
+        self.img = self.fonto.render(f"残り時間:{self.time}秒", 0, self.color)
+        self.center = [WIDTH-200, HEIGHT-50]
+    
+    def update(self, screen: pg.Surface) -> None:
+        """
+        タイマーを表示させ、一秒をカウントし、タイムを減らす
+        引数 screen：画面Surface
+        """
+        self.img = self.fonto.render(f"残り時間:{self.time}秒", 0, self.color)
+        screen.blit(self.img, self.center)
+
+        self.one_second_cnt += 1
+        if self.one_second_cnt >= 50:
+            self.time -=1
+            self.one_second_cnt = 0
+    
+    def is_time_over(self) -> bool:
+        """
+        タイムオーバーしているか判定します
+        戻り値 : bool
+        """
+        return self.time < 0
+
         
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
@@ -208,6 +243,7 @@ def main():
     beams = []
     effects = []
     score = Score()
+    timer = Timer(10)
     clock = pg.time.Clock()
     tmr = 0
     while True:
@@ -219,6 +255,20 @@ def main():
                 beams.append(Beam(bird))            
         screen.blit(bg_img, [0, 0])
         
+        if timer.is_time_over():
+            img_num = 8
+            text = "Time Over"
+            if not bombs:
+                img_num = 6
+                text = "GameClear"
+            bird.change_img(img_num, screen)
+            fonto = pg.font.Font(None, 80)
+            txt = fonto.render(text, True, (255, 0, 0))
+            screen.blit(txt, [WIDTH//2-150, HEIGHT//2])
+            pg.display.update()
+            time.sleep(5)
+            return
+            
 
         for bomb in bombs:
             if bird.rct.colliderect(bomb.rct):
@@ -254,6 +304,7 @@ def main():
         for eff in effects:
             eff.update(screen)
         score.update(screen)
+        timer.update(screen)
         pg.display.update()
         tmr += 1
         clock.tick(50)
