@@ -228,9 +228,11 @@ class Timer:
         タイマーを表示させ、一秒をカウントし、タイムを減らす
         引数 screen：画面Surface
         """
+        # 表示部
         self.img = self.fonto.render(f"残り時間:{self.time}秒", 0, self.color)
         screen.blit(self.img, self.center)
 
+        # 秒数カウント部
         self.one_second_cnt += 1
         if self.one_second_cnt >= 50:
             self.time -=1
