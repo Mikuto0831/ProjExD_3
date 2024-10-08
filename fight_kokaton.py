@@ -281,7 +281,7 @@ def main():
             time.sleep(5)
             return
             
-
+        # 爆弾とこうかとんの衝突判定
         for bomb in bombs:
             if bird.rct.colliderect(bomb.rct):
                 # ゲームオーバー時に，こうかとん画像を切り替え，1秒間表示させる
@@ -293,6 +293,7 @@ def main():
                 time.sleep(5)
                 return
         
+        # ビームと爆弾の衝突判定
         for i,bomb in enumerate(bombs):
             for j,beam in enumerate(beams):
                 if bomb is not None and beam is not None:
