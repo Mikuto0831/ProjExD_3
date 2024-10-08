@@ -152,6 +152,9 @@ class Score:
         self.img = self.fonto.render(f"スコア:{self.score}", 0, self.color)
         screen.blit(self.img, self.center)
 
+    def add(self)-> None:
+        self.score += 1
+
 
 def main():
     pg.display.set_caption("たたかえ！こうかとん")
@@ -159,6 +162,7 @@ def main():
     bg_img = pg.image.load("fig/pg_bg.jpg")
     bird = Bird((300, 200))
     bombs = [Bomb((255, 0, 0), 10) for _ in range(NUM_OF_BOMBS)]
+    score = Score()
     clock = pg.time.Clock()
     tmr = 0
     beam = None
@@ -183,19 +187,12 @@ def main():
                 time.sleep(5)
                 return
         
-        if beam is not None and bomb is not None:
-            if beam.rct.colliderect(bomb.rct):  # ビームと爆弾が衝突したら
-                beam, bomb = None, None
-                bird.change_img(6, screen)
-                pg.display.update()
-                time.sleep(1)
-                return
-        
         for i,bomb in enumerate(bombs):
             if beam is not None:
                 if beam.rct.colliderect(bomb.rct):  # ビームと爆弾が衝突したら
                     beam, bombs[i] = None, None
                     bird.change_img(6, screen)
+                    score.add()
                     pg.display.update()
         
         bombs = [bomb for bomb in bombs if bomb is not None]
@@ -206,6 +203,7 @@ def main():
             beam.update(screen) 
         for bomb in bombs:  
             bomb.update(screen)
+        score.update(screen)
         pg.display.update()
         tmr += 1
         clock.tick(50)
